@@ -10,6 +10,73 @@ const fetch = require("node-fetch");
 const delay = require("delay");
 const fs = require("fs-extra");
 require("dotenv").config();
+const os = require("os");
+
+const userAgentGenerator = {
+  edge: function () {
+    const edgeVersion = Math.floor(Math.random() * 25) + 90;
+    const chromeVersion = Math.floor(Math.random() * 20) + 96;
+    const safariVersion = Math.floor(Math.random() * 6) + 10;
+    const webkitVersion = Math.floor(Math.random() * 700) + 500;
+    const osPlatform =
+      os.platform() === "win32"
+        ? "Windows NT 10.0; Win64; x64"
+        : "Macintosh; Intel Mac OS X 10_15_17";
+    const userAgent = `Mozilla/5.0 (${osPlatform}) AppleWebKit/${webkitVersion}.36 (KHTML, like Gecko) Chrome/${chromeVersion}.0.0.0 Safari/${webkitVersion}.36 Edg/${edgeVersion}.0.1901.203`;
+    return userAgent;
+  },
+  chrome: function () {
+    const windowsNtVersion = Math.floor(Math.random() * 3) + 7;
+    const chromeVersion = Math.floor(Math.random() * 20) + 96;
+    const webkitVersion = Math.floor(Math.random() * 700) + 500;
+    const osPlatform =
+      os.platform() === "win32"
+        ? `Windows NT ${windowsNtVersion}.0; Win64; x64`
+        : "Macintosh; Intel Mac OS X 10_15_17";
+    const userAgent = `Mozilla/5.0 (${osPlatform}) AppleWebKit/${webkitVersion}.36 (KHTML, like Gecko) Chrome/${chromeVersion}.0.3163.100 Safari/${webkitVersion}.36`;
+    return userAgent;
+  },
+  firefox: function () {
+    const windowsNtVersion = Math.floor(Math.random() * 3) + 7;
+    const firefoxVersion = Math.floor(Math.random() * 26) + 95;
+    const geckoVersion = Math.floor(Math.random() * 30) + 20100101;
+    const osPlatform =
+      os.platform() === "win32"
+        ? `Windows NT ${windowsNtVersion}.0; Win64; x64`
+        : "Macintosh; Intel Mac OS X 10_15_17";
+    const userAgent = `Mozilla/5.0 (${osPlatform}; rv: ${firefoxVersion}.0) Gecko/${geckoVersion} Firefox/${firefoxVersion}.0`;
+    return userAgent;
+  },
+  safari: function () {
+    const windowsNtVersion = Math.floor(Math.random() * 3) + 7;
+    const safariVersion = Math.floor(Math.random() * 6) + 10;
+    const webkitVersion = Math.floor(Math.random() * 700) + 500;
+    const osPlatform =
+      os.platform() === "win32"
+        ? `Windows NT ${windowsNtVersion}.0; Win64; x64`
+        : "Macintosh; Intel Mac OS X 10_15_17";
+    const userAgent = `Mozilla/5.0 (${osPlatform}) AppleWebKit/${webkitVersion}.1.15 (KHTML, like Gecko) Version/${safariVersion}.1.15 Safari/${webkitVersion}.1.15`;
+    return userAgent;
+  },
+  android: function () {
+    const edgeVersion = Math.floor(Math.random() * 25) + 90;
+    const androidVersion = Math.floor(Math.random() * 8) + 5;
+    const chromeVersion = Math.floor(Math.random() * 20) + 96;
+    const webkitVersion = Math.floor(Math.random() * 700) + 500;
+    const osPlatform = Math.floor(Math.random() * 10);
+    const userAgent = `Mozilla/5.0 (Linux; Android ${androidVersion}.${osPlatform}; K) AppleWebKit/5${webkitVersion}37.36 (KHTML, like Gecko) Chrome/${chromeVersion}.0.0.0 Mobile Safari/${webkitVersion}.36 EdgA/${edgeVersion}.0.1901.196`;
+    return userAgent;
+  },
+  ios: function () {
+    const iosVersion = Math.floor(Math.random() * 7) + 9;
+    const edgeVersion = Math.floor(Math.random() * 25) + 90;
+    const safariVersion = Math.floor(Math.random() * 6) + 10;
+    const webkitVersion = Math.floor(Math.random() * 700) + 500;
+    const osPlatform = Math.floor(Math.random() * 10);
+    const userAgent = `Mozilla/5.0 (iPhone; CPU iPhone OS ${iosVersion}_${osPlatform} like Mac OS X) AppleWebKit/${webkitVersion}.1.15 (KHTML, like Gecko) EdgiOS/${edgeVersion}.0.1901.187 Version/${safariVersion}.0 Mobile/15E148 Safari/${webkitVersion}.1`;
+    return userAgent;
+  },
+};
 
 const namav1 = () =>
   new Promise((resolve, reject) => {
@@ -64,10 +131,12 @@ const Passwd = (length) =>
   let name;
   let succesfully = 0;
   let gagal = 0;
-
-  // console.log(proxy);
   const jumlah = readline.question("Input Jumlah Run : ");
   for (let index = 0; index < jumlah; index++) {
+    const userAgentKeys = Object.keys(userAgentGenerator);
+    const randomUserAgentKey =
+      userAgentKeys[Math.floor(Math.random() * userAgentKeys.length)];
+    const randomUserAgent = userAgentGenerator[randomUserAgentKey]();
     console.log("");
     const listproxy = await fs
       .readFileSync("listproxy.txt", {
@@ -128,17 +197,12 @@ const Passwd = (length) =>
       const time = { visible: true, timeout: 0 };
       const pages = await browser.pages();
       const page = pages[0];
-
-      // await page.setViewport({ width: 1920, height: 1080 });
-      // await page.setUserAgent(uagent);
+      await page.setUserAgent(randomUserAgent);
       await page.authenticate({
         username: process.env.PROXYUSERNAME,
         password: process.env.PASSWORD,
       });
-      // await page.authenticate({
-      //   username: `brd-customer-hl_7da2a2da-zone-zone6-country-us`,
-      //   password: "5omkljmze92i",
-      // });
+
       await page.goto(
         "https://www.hm.com/register?utm_source=invite_a_friend&utm_medium=desktop&rcr=MzIyMTAwMDg1MA&rm=es_mx",
         {
@@ -202,14 +266,14 @@ const Passwd = (length) =>
           }
         );
         await page.click(
-          "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div.slick-slider.Carousel-module--slider__3Tuz6.Carousel-module--arrowSlider__UkEMD.slick-initialized > div > div > div:nth-child(6)"
+          "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div.slick-slider.Carousel-module--slider__3Tuz6.Carousel-module--arrowSlider__UkEMD.slick-initialized > div > div > div:nth-child(5)"
         );
       } catch (error) {
         await page.waitForSelector(
           "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div > div > div > div:nth-child(5) > div > div"
         );
         await page.click(
-          "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div.slick-slider.Carousel-module--slider__3Tuz6.Carousel-module--arrowSlider__UkEMD.slick-initialized > div > div > div:nth-child(5)",
+          "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div.slick-slider.Carousel-module--slider__3Tuz6.Carousel-module--arrowSlider__UkEMD.slick-initialized > div > div > div:nth-child(4)",
           {
             visible: true,
             timeout: 20000,
@@ -247,7 +311,6 @@ const Passwd = (length) =>
       fs.removeSync("./" + name);
       succesfully++;
     } catch (error) {
-      readline.question("");
       browser.close();
       await delay(1000);
       fs.removeSync("./" + name);
