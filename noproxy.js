@@ -136,6 +136,7 @@ const Passwd = (length) =>
   let gagal = 0;
   const jumlah = readline.question("Input Jumlah Run : ");
   for (let index = 0; index < jumlah; index++) {
+    console.log(validasi);
     const userAgentKeys = Object.keys(userAgentGenerator);
     const randomUserAgentKey =
       userAgentKeys[Math.floor(Math.random() * userAgentKeys.length)];
@@ -147,7 +148,7 @@ const Passwd = (length) =>
       })
       .split("\r\n");
     const proxy = listproxy[Math.floor(Math.random() * listproxy.length)];
-    console.log(proxy);
+    // console.log(proxy);
     try {
       const indoName = await namav1();
       name =
@@ -337,17 +338,23 @@ const Passwd = (length) =>
             chalk.redBright(`[ INFO ] `) +
               chalk.greenBright("Mencoba Mengulang")
           );
+          await page.reload();
+          await delay(2000);
         }
-      } while (validasi === false && maxrefresh <= 3);
+      } while (validasi === false && maxrefresh <= 1);
       browser.close();
       await delay(1000);
       fs.removeSync("./" + name);
+      validasi = undefined;
+      maxrefresh = 0;
     } catch (error) {
       browser.close();
       await delay(1000);
       fs.removeSync("./" + name);
       console.log(chalk.redBright(`[ DEBUG ] `) + chalk.greenBright(error));
       gagal++;
+      validasi = undefined;
+      maxrefresh = 0;
     }
   }
 
