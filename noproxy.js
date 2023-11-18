@@ -227,12 +227,13 @@ const Passwd = (length) =>
             chalk.yellowBright(`[ INFO ] `) +
               chalk.greenBright("Waiting Load Website..")
           );
-
-          await page.waitForSelector("#onetrust-accept-btn-handler", {
-            visible: true,
-            timeout: 15000,
-          });
-          await page.click("#onetrust-accept-btn-handler");
+          try {
+            await page.waitForSelector("#onetrust-accept-btn-handler", {
+              visible: true,
+              timeout: 15000,
+            });
+            await page.click("#onetrust-accept-btn-handler");
+          } catch (error) {}
           await delay(3000);
           await page.reload();
           await delay(1000);
