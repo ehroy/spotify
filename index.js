@@ -65,10 +65,17 @@ const Passwd = (length) =>
   let succesfully = 0;
   let gagal = 0;
 
+  // console.log(proxy);
   const jumlah = readline.question("Input Jumlah Run : ");
   for (let index = 0; index < jumlah; index++) {
     console.log("");
-
+    const listproxy = await fs
+      .readFileSync("listproxy.txt", {
+        encoding: "ASCII",
+      })
+      .split("\r\n");
+    const proxy = listproxy[Math.floor(Math.random() * listproxy.length)];
+    console.log(proxy);
     try {
       const indoName = await namav1();
       name =
@@ -113,7 +120,7 @@ const Passwd = (length) =>
           "--use-mock-keychain",
           "--disable-gpu",
           "--incognito",
-          `--proxy-server=${process.env.PROXY_URL}`,
+          `--proxy-server=http://${proxy}`,
         ],
       });
 
@@ -122,12 +129,10 @@ const Passwd = (length) =>
       const pages = await browser.pages();
       const page = pages[0];
 
-      //   await page.setViewport({ width: 350, height: 700 });
+      // await page.setViewport({ width: 1920, height: 1080 });
       // await page.setUserAgent(uagent);
       await page.authenticate({
-        username:
-          process.env.PROXYUSERNAME +
-          `-session-${(1000000 * Math.random()) | 0}`,
+        username: process.env.PROXYUSERNAME,
         password: process.env.PASSWORD,
       });
       // await page.authenticate({
@@ -193,18 +198,22 @@ const Passwd = (length) =>
           "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div.slick-slider.Carousel-module--slider__3Tuz6.Carousel-module--arrowSlider__UkEMD.slick-initialized > div > div > div:nth-child(5)",
           {
             visible: true,
-            timeout: 10000,
+            timeout: 20000,
           }
         );
         await page.click(
-          "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div.slick-slider.Carousel-module--slider__3Tuz6.Carousel-module--arrowSlider__UkEMD.slick-initialized > div > div > div:nth-child(5)"
+          "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div.slick-slider.Carousel-module--slider__3Tuz6.Carousel-module--arrowSlider__UkEMD.slick-initialized > div > div > div:nth-child(6)"
         );
       } catch (error) {
         await page.waitForSelector(
           "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div > div > div > div:nth-child(5) > div > div"
         );
         await page.click(
-          "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div > div > div > div:nth-child(5) > div > div"
+          "#main-content > div.FadeInOut-module--container__1IyAW.FadeInOut-module--entered__eHaKQ > div > div.slick-slider.Carousel-module--slider__3Tuz6.Carousel-module--arrowSlider__UkEMD.slick-initialized > div > div > div:nth-child(5)",
+          {
+            visible: true,
+            timeout: 20000,
+          }
         );
       }
       await delay(1000);
@@ -237,8 +246,8 @@ const Passwd = (length) =>
       await delay(1000);
       fs.removeSync("./" + name);
       succesfully++;
-      //   readline.question("");
     } catch (error) {
+      readline.question("");
       browser.close();
       await delay(1000);
       fs.removeSync("./" + name);
