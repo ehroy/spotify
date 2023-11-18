@@ -339,6 +339,9 @@ const Passwd = (length) =>
           );
         }
       } while (validasi === false && maxrefresh <= 3);
+      browser.close();
+      await delay(1000);
+      fs.removeSync("./" + name);
     } catch (error) {
       browser.close();
       await delay(1000);
